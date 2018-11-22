@@ -29,7 +29,7 @@ weather(url, *args)
 
 url = ('http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%91%D1%80%D0%BE%D0%B4%D0%B0%D1%85,'
     '_%D0%9B%D1%8C%D0%B2%D1%96%D0%B2%D1%81%D1%8C%D0%BA%D0%B0_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C')
-args = ('<span class="t_0" style="display: block;">', '<div class="cd7" onmouseover="tooltip(this, \'<b>')
+args = ('<span class="t_0" style="display: block;">', '<td colspan="2" class="d"> <div class="cc_0"><div class="cd4" onmouseover="tooltip(this, \'<b>')
 print("Rp5.ua: ")
 weather(url, *args)
 
