@@ -21,11 +21,11 @@ def weather(url, *args):
         accu_temp = ''.join(accu_temp)
         print('{0:^25s}'.format(html.unescape(accu_temp)))
 
-def rp5(rp_url, *args):
+def weather(rp_url, *args):
     '''Програма виводить значення температури і погодні умови із сайту rp5.ua
     '''
     headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64;)'}
-    rp5 = requests.get(url, headers = headers)
+    rp5_page = requests.get(rp_url, headers = headers)
     rp5_page = str(rp5_page.text)
     rp5_TEMP_TAG = ''
     for rp5_TEMP_TAG in args:
@@ -39,10 +39,9 @@ def rp5(rp_url, *args):
             else:
                 break
         rp5_temp = ''.join(rp5_temp)
-        print('{0:<10s}'.format(html.unescape(rp5_temp)))
+        print('{0:^20s}'.format(html.unescape(rp5_temp)))
 
 url = ('https://www.accuweather.com/uk/ua/brody/324506/weather-forecast/324506')
-
 args = ('<span class="large-temp">', '<span class="cond">')
 print("Accuweather: ")
 weather(url, *args)
