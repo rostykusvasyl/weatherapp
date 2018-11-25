@@ -58,8 +58,6 @@ def output(name, temp, condition):
     for k,v in lst.items():
         print(k, v.rjust(18, '.'))
     print('\n')
-    # print(f"Temperature: {html.unescape(temp)}")
-    # print(f"Condition: {condition}", end="\n\n")
 
 
 def main():
