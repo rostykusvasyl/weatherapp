@@ -14,11 +14,11 @@ rp5_tags=('<span class="t_0" style="display: block;">','<div class="cn6" onmouse
 
 sinoptik_url = ('https://ua.sinoptik.ua/%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D0%'
        'B0-%D0%B1%D1%80%D0%BE%D0%B4%D0%B8')
-sinoptik_tags = ('<p class="today-temp">', '<div class="weatherIco d430" title=')
+sinoptik_tags = ('<p class="today-temp">', '<div class="img"> <img width="188" height="150" src="//sinst.fwdcdn.com/img/weatherImg/b/n400.jpg" alt=')
 
 
 container_tags = ('<div class="temp">', '<div id="ArchTemp">', '<div class="main loaded" id="bd1">',
-                    '<div class="main loaded" id="bd1">')
+                    '<p class="today-time">')
 
 def get_page(url):
     '''Функція повертає строкові дані з веб сторінки, вказаній в url адресі
@@ -42,7 +42,7 @@ def get_weather_info(get_page, tags, container_tags):
             value_start = tag_index + tag_size
             content = ''
             for char in get_page[value_start:]:
-                if char != '<' and char != '>':
+                if char != '<' and char != '>' and char != '/':
                     content += char
                 else:
                     break
