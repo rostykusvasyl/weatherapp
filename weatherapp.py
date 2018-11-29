@@ -1,4 +1,5 @@
-#!/usr/bin/python3
+#!/home/vasyl/StartDragon/weatherapp/bin/python3
+
 
 import requests, html
 
