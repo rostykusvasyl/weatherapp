@@ -1,79 +1,90 @@
 #!/home/vasyl/StartDragon/weatherapp/bin/python3
 
-
+from bs4 import BeautifulSoup
 import requests, html
 
 
-accu_url = ('https://www.accuweather.com/uk/ua/brody/324506/weather-forecast/324506')
-accu_tags = ('<span class="large-temp">', '<span class="cond">')
+# accu_url = ('https://www.accuweather.com/uk/ua/brody/324506/'
+#             'weather-forecast/324506')
 
-rp5_url = ('http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%91%D1%80%D0%'
-            'BE%D0%B4%D0%B0%D1%85,_%D0%9B%D1%8C%D0%B2%D1%96%D0%B2%D1%81%D1%8C%D0%BA%D0%'
+
+url = ('http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%'
+             'B2_%D0%91%D1%80%D0%BE%D0%B4%D0%B0%D1%85,_%D0%9B%D1%8C%'
+             'D0%B2%D1%96%D0%B2%D1%81%D1%8C%D0%BA%D0%'
             'B0_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C')
-rp5_tags=('<span class="t_0" style="display: block;">','<div class="cn6" onmouseover="tooltip(this, \'<b>')
 
 
-sinoptik_url = ('https://ua.sinoptik.ua/%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D0%'
-       'B0-%D0%B1%D1%80%D0%BE%D0%B4%D0%B8')
-sinoptik_tags = ('<p class="today-temp">', '<div class="img"> <img width="188" height="150" src="//sinst.fwdcdn.com/img/weatherImg/b/n400.jpg" alt=')
+# sinoptik_url = ('https://ua.sinoptik.ua/%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D0%'
+#        'B0-%D0%B1%D1%80%D0%BE%D0%B4%D0%B8')
 
-
-container_tags = ('<div class="temp">', '<div id="ArchTemp">', '<div class="main loaded" id="bd1">',
-                    '<p class="today-time">')
 
 def get_page(url):
-    '''Функція повертає строкові дані з веб сторінки, вказаній в url адресі
+    '''завантажуємо HTML-вміст веб-сторінки з вказаної адреси
     '''
     headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64;)'}
-    html_page = requests.get(url, headers = headers)
-    return html_page.text
+    page  = requests.get(url, headers = headers)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    return soup
+
+get_page = get_page(url)
+# def get_weather_info(get_page):
+#     '''Функція повертає список із значеннями про стан погоди
+#     '''
+#     weather_info = {}  # створюємо пустий словник
+#                        # для внесення даних про стан погоди
+#     forecast = get_page.find(class_="bg bg-cl")  # знаходимо на сторінці
+#                                                  # <div>-контейнер з потрібною
+#                                                  # нам інформацією
+#     temp_info = forecast.find(class_="large-temp").get_text()
+#     weather_info['Temperature: '] = temp_info
+
+#     realfeel = forecast.find(class_="realfeel").get_text()
+#     weather_info['Realfeel: '] = realfeel
+
+#     cond = forecast.find(class_="cond").get_text()
+#     weather_info['Condition: '] = cond
+
+#     return weather_info
 
 
-def get_weather_info(get_page, tags, container_tags):
-    '''Функція повертає кортеж із значеннями про стан погоди для заданих тегів
+def get_weather_info_rp5(get_page):
+    '''Функція повертає список із значеннями про стан погоди
     '''
-    for cont_tag in container_tags:
-        tag_info = []
-        for tag in tags:
-            if cont_tag in get_page and tag in get_page:
-                tag_index = get_page.find(tag, get_page.find(cont_tag))
-            else:
-                tag_index = get_page.find(tag)
-            tag_size = len(tag)
-            value_start = tag_index + tag_size
-            content = ''
-            for char in get_page[value_start:]:
-                if char != '<' and char != '>' and char != '/':
-                    content += char
-                else:
-                    break
-            tag_info.append(content)
-    return tuple(tag_info)
+    weather_info = {}  # створюємо пустий словник
+                       # для внесення даних про стан погоди
+    forecast = get_page.find(class_="n underlineRow toplineRow blue")  # знаходимо на сторінці
+                                                                  # <div>-контейнер з потрібною
+                                                                  # нам інформацією
+    temp_info = forecast.find(class_="t_0").get_text()
+    weather_info['Temperature: '] = temp_info
+
+    forecast_cond = get_page.find(id="ftab_1_content")
+    cond = forecast_cond.find(colspan="2")
+
+    print(cond)
+
+# def output(name, info):
+#     '''Виводимо на екран результат отриманих значень про стан погоди
+#     '''
+#     print(name.center(30, '='))
+#     for k,v in info.items():
+#         print(k, v)
+#     print('\n')
+
+get_weather_info_rp5(get_page)
 
 
-def output(name, temp, condition):
-    '''Виводимо на екран результат отриманих значень про стан погоди із вказаних сайтів
-    '''
-    print(f"{name}".center(len(condition) + len("Condition") + len("Condition") + len(name), '='))
-    lst = {' Temperature: ': html.unescape(temp), '  Condition: ': condition}
-    for k,v in lst.items():
-        print(k, v.rjust(18, '.'))
-    print('\n')
+# def main():
+#     '''Main entry point in program.
+#     '''
+#     weather_sites = {'Accuweather: ': accu_url}
+
+#     for name in weather_sites:
+#         url= weather_sites[name]
+#         content = get_page(url)
+#         info = get_weather_info(content)
+#         output(name, info)
 
 
-def main():
-    '''Main entry point in program.
-    '''
-    weather_sites = {'Accuweather': (accu_url, accu_tags),
-                    'Rp5': (rp5_url, rp5_tags),
-                    'Sinoptik.ua': (sinoptik_url, sinoptik_tags)}
-
-    for name in weather_sites:
-        url, tags = weather_sites[name]
-        content = get_page(url)
-        temp, condition = get_weather_info(content, tags, container_tags)
-        output(name, temp, condition)
-
-
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
