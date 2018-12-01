@@ -1,14 +1,13 @@
-#!/home/vasyl/StartDragon/weatherapp/bin/python3
+#!/usr/bin/env python3
 
 from bs4 import BeautifulSoup
-import requests, html
+import requests, argparse, sys
 
 
-# accu_url = ('https://www.accuweather.com/uk/ua/brody/324506/'
-#             'weather-forecast/324506')
+accu_url = ('https://www.accuweather.com/uk/ua/brody/324506/current-weather/324506')
 
 
-url = ('http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%'
+rp5_url = ('http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%'
              'B2_%D0%91%D1%80%D0%BE%D0%B4%D0%B0%D1%85,_%D0%9B%D1%8C%'
              'D0%B2%D1%96%D0%B2%D1%81%D1%8C%D0%BA%D0%'
             'B0_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C')
@@ -18,73 +17,111 @@ url = ('http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%'
 #        'B0-%D0%B1%D1%80%D0%BE%D0%B4%D0%B8')
 
 
-def get_page(url):
-    '''завантажуємо HTML-вміст веб-сторінки з вказаної адреси
+def get_weather_info(url):
+    '''Функція повертає список із значеннями про стан погоди
     '''
     headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64;)'}
     page  = requests.get(url, headers = headers)
     soup = BeautifulSoup(page.content, 'html.parser')
-    return soup
 
-get_page = get_page(url)
-# def get_weather_info(get_page):
-#     '''Функція повертає список із значеннями про стан погоди
-#     '''
-#     weather_info = {}  # створюємо пустий словник
-#                        # для внесення даних про стан погоди
-#     forecast = get_page.find(class_="bg bg-cl")  # знаходимо на сторінці
-#                                                  # <div>-контейнер з потрібною
-#                                                  # нам інформацією
-#     temp_info = forecast.find(class_="large-temp").get_text()
-#     weather_info['Temperature: '] = temp_info
-
-#     realfeel = forecast.find(class_="realfeel").get_text()
-#     weather_info['Realfeel: '] = realfeel
-
-#     cond = forecast.find(class_="cond").get_text()
-#     weather_info['Condition: '] = cond
-
-#     return weather_info
-
-
-def get_weather_info_rp5(get_page):
-    '''Функція повертає список із значеннями про стан погоди
-    '''
     weather_info = {}  # створюємо пустий словник
                        # для внесення даних про стан погоди
-    forecast = get_page.find(class_="n underlineRow toplineRow blue")  # знаходимо на сторінці
-                                                                  # <div>-контейнер з потрібною
-                                                                  # нам інформацією
-    temp_info = forecast.find(class_="t_0").get_text()
+
+    tag_container = soup.find(id="detail-now")  # знаходимо на сторінці
+                                                              # <div>-контейнер з потрібною
+                                                              # нам інформацією
+    forecast = tag_container.find(class_="info")
+    temp_info = forecast.find(class_="large-temp").get_text()
     weather_info['Temperature: '] = temp_info
 
-    forecast_cond = get_page.find(id="ftab_1_content")
-    cond = forecast_cond.find(colspan="2")
+    realfeel = forecast.find(class_="small-temp").get_text()
+    weather_info['Realfeel: '] = realfeel
 
-    print(cond)
+    cond = forecast.find(class_="cond").get_text()
+    weather_info['Condition: '] = cond
 
-# def output(name, info):
-#     '''Виводимо на екран результат отриманих значень про стан погоди
-#     '''
-#     print(name.center(30, '='))
-#     for k,v in info.items():
-#         print(k, v)
-#     print('\n')
-
-get_weather_info_rp5(get_page)
+    return weather_info
 
 
-# def main():
-#     '''Main entry point in program.
-#     '''
-#     weather_sites = {'Accuweather: ': accu_url}
-
-#     for name in weather_sites:
-#         url= weather_sites[name]
-#         content = get_page(url)
-#         info = get_weather_info(content)
-#         output(name, info)
+def output(name, accu_info):
+    '''Виводимо на екран результат отриманих значень про стан погоди
+    '''
+    print(name.center(30, '='))
+    for k,v in accu_info.items():
+        print(k, v)
+    print('\n')
 
 
-# if __name__ == "__main__":
-#     main()
+def get_weather_info_rp5(url):
+    '''Функція повертає список із значеннями про стан погоди
+    '''
+    headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64;)'}
+    page  = requests.get(url, headers = headers)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    weather_info = {}  # створюємо пустий словник
+                       #для внесення даних про стан погоди
+    tag_container = soup.find(id="archiveString")    # знаходимо на сторінці <div>-контейнер
+                                                     #  з потрібною нам інформацією
+
+    forecast_temp = tag_container.find(id="ArchTemp")
+    temp_info = forecast_temp.find(class_="t_0").get_text()
+    weather_info['Temperature: '] = temp_info
+
+
+    forecast_realfeel = tag_container.find(class_="TempStr")
+    realfeel = forecast_realfeel.find(class_="t_0").get_text()
+    weather_info['Realfeel: '] = realfeel
+
+    forecast_string = soup.find(id="forecastShort-content").get_text()
+    lst_forecast = forecast_string.split(',')
+    cond = lst_forecast[2]
+    weather_info['Condition: '] = cond
+    return weather_info
+
+def output(name, rp5_info):
+    '''Виводимо на екран результат отриманих значень про стан погоди
+    '''
+    print(name.center(20, '='))
+    for k,v in rp5_info.items():
+        print(k, v)
+    print('\n')
+
+def main(argv):
+    '''Main entry point in program.
+    '''
+    Command_list = {'accu': 'Accuweather', 'rp5': 'Rp5'}
+
+    parser = argparse.ArgumentParser(prog = 'PROG_WEATHER', description = 'Displaying weather information.')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.0.1')
+    parser.add_argument('command', help = 'enter "accu" for the Accuwether website or "rp5" for the Rp5 site', nargs='*')
+    args = parser.parse_args(argv)
+
+    weather_sites = {'Accuweather': accu_url, 'Rp5': rp5_url}
+
+    if args.command:
+        command = args.command[0]
+        if command in Command_list:
+            weather_sites = { Command_list[command]: weather_sites[Command_list[command]]}
+            if command == 'accu':
+                name = 'Accuweather'
+                url = weather_sites[name]
+                accu_info = get_weather_info(url)
+                output(name, accu_info)
+            elif command == 'rp5':
+                name = 'Rp5'
+                url = weather_sites[name]
+                rp5_info = get_weather_info_rp5(url)
+                output(name, rp5_info)
+        else:
+            print("Unknown command provided!")
+            sys.exit(1)
+    else:
+        accu_info = get_weather_info(accu_url)
+        output('Accuweather', accu_info)
+        rp5_info = get_weather_info_rp5(rp5_url)
+        output('Rp5', rp5_info)
+
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
