@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #! /usr/bin/env python3
 
 import argparse
@@ -127,3 +128,6 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+=======
+print("Hello world")
+>>>>>>> 20599bf60d156fc60e059c91e32734307eb60d02
