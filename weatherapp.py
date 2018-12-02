@@ -1,8 +1,12 @@
 #! /usr/bin/env python3
 
+'''Program for web-scraping of weather sites'''
+
 import argparse
 
 import sys
+
+import csv
 
 import requests
 
@@ -58,8 +62,9 @@ def get_weather_info_rp5(url):
     soup = BeautifulSoup(page.content, 'html.parser')
     weather_info = {}  # створюємо пустий словник
                        #для внесення даних про стан погоди
-    tag_container = soup.find(id="archiveString")  # знаходимо на сторінці <div>-контейнер
-                                                   # з потрібною нам інформацією
+    tag_container = soup.find(id="archiveString")  # знаходимо на сторінці
+                                                   # <div>-контейнер з
+                                                   #потрібною нам інформацією
 
     forecast_temp = tag_container.find(id="ArchTemp")
     temp_info = forecast_temp.find(class_="t_0").get_text()
@@ -81,24 +86,36 @@ def output(name, info):
        отриманих значень про стан погоди
     '''
     print(name.center(20, '='))
-    for k, v in info.items():
-        print(k, v)
+    for key, value in info.items():
+        print(key, value)
     print('\n')
+
+
+def output_csv(name, info):
+    '''write file in .csv format'''
+    data = []
+    data.append(info)
+    with open('csv_weather.csv', 'at') as frecord:
+        frecord.write(name + '\n')
+        writer = csv.DictWriter(frecord, fieldnames=list(data[0].keys()))
+        writer.writeheader()
+        writer.writerows(data)
+
 
 def main(argv):
     '''Main entry point in program.
     '''
-    command_list = {'accu': 'Accuweather', 'rp5': 'Rp5'}
+    command_list = {'accu': 'Accuweather', 'rp5': 'Rp5', 'csv': 'csv'}
 
     parser = argparse.ArgumentParser(prog='PROG_WEATHER',
                                      description='Displaying weather information.')
 
     parser.add_argument('--version', action='version', version='%(prog)s 0.0.1')
-    parser.add_argument('command', help='enter "accu" for the Accuwether website'
-                        'or "rp5" for the Rp5 site', nargs='*')
+    parser.add_argument('command', help='Enter "accu" for the '
+                        'Accuwether website or "rp5" for the '
+                        'Rp5 site.', nargs='*')
     args = parser.parse_args(argv)
-
-    weather_sites = {'Accuweather': accu_url, 'Rp5': rp5_url}
+    weather_sites = {'Accuweather': accu_url, 'Rp5': rp5_url, 'csv': 'csv'}
 
     if args.command:
         command = args.command[0]
@@ -114,6 +131,11 @@ def main(argv):
                 url = weather_sites[name]
                 rp5_info = get_weather_info_rp5(url)
                 output(name, rp5_info)
+            elif command == 'csv':
+                accu_info = get_weather_info(accu_url)
+                output_csv('Accuweather', accu_info)
+                rp5_info = get_weather_info_rp5(rp5_url)
+                output_csv('Rp5', rp5_info)
         else:
             print('Unknown command provided!')
             sys.exit(1)
