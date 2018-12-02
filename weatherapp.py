@@ -35,9 +35,9 @@ def get_weather_info(url):
     weather_info = {}  # створюємо пустий словник
                        # для внесення даних про стан погоди
 
-    tag_container = soup.find(id="detail-now") # знаходимо на сторінці
-                                               # <div>-контейнер з потрібною
-                                               # нам інформацією
+    tag_container = soup.find(id="detail-now")  # знаходимо на сторінці
+                                                # <div>-контейнер з потрібною
+                                                # нам інформацією
     forecast = tag_container.find(class_="info")
     temp_info = forecast.find(class_="large-temp").get_text()
     weather_info['Temperature: '] = temp_info
@@ -58,8 +58,8 @@ def get_weather_info_rp5(url):
     soup = BeautifulSoup(page.content, 'html.parser')
     weather_info = {}  # створюємо пустий словник
                        #для внесення даних про стан погоди
-    tag_container = soup.find(id="archiveString") # знаходимо на сторінці <div>-контейнер
-                                                  # з потрібною нам інформацією
+    tag_container = soup.find(id="archiveString")  # знаходимо на сторінці <div>-контейнер
+                                                   # з потрібною нам інформацією
 
     forecast_temp = tag_container.find(id="ArchTemp")
     temp_info = forecast_temp.find(class_="t_0").get_text()
