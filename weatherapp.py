@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-<<<<<<< HEAD
 '''Program for web-scraping of weather sites'''
 
 import argparse
