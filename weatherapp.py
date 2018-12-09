@@ -364,7 +364,7 @@ def get_rp5_info():
     return rp5_info
 
 
-def writer_file_in_csv():
+def writer_file_in_csv(refresh=False):
     '''write data in file format .csv'''
 
     data = [get_accu_info(), get_rp5_info()]
