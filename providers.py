@@ -328,3 +328,72 @@ class Rp5WeatherProvider(AccuWeatherProvider):
     def run(self, refresh=False):
         content = self.get_page_source(self.url, refresh=refresh)
         return self.get_rp5_weather(content)
+
+
+# def configurate_sinoptik(refresh=False):
+#     ''' The user chooses the city for which he wants to get the weather.
+#     '''
+#     # find continent
+#     soup = BeautifulSoup(get_page_source(config.SINOPTIK_BROWSE_LOCATIONS,\
+#                                          refresh=refresh), 'html.parser')
+#     container_continent = soup.find('div', attrs={'style': 'font-size:12px;'})
+#     continent_link = container_continent.find_all("a")
+#     list_continent = []
+#     for link in continent_link:
+#         url = link.get('href')
+#         location = link.get_text()
+#         list_continent.append((location, url))
+#     for index, location in enumerate(list_continent):
+#         print("{}. {}".format((index + 1), (location[0])))
+#     index_continent = int(input('Please select continent location: '))
+#     link_continent = list_continent[index_continent - 1]
+#     country_url = 'http:' + link_continent[1]
+
+#     # find counrty
+#     country_tag = BeautifulSoup\
+#                 (get_page_source(country_url, refresh=refresh), 'html.parser')
+#     container_country = country_tag.find(class_="maxHeight")
+#     country_link = container_country.find_all("a")
+#     list_country = []
+#     for link in country_link:
+#         url = link.get('href')
+#         location = link.get_text()
+#         list_country.append((location, url))
+#     for index, location in enumerate(list_country):
+#         print("{}. {}".format((index + 1), (location[0])))
+#     index_country = int(input('Please select country location: '))
+#     link_country = list_country[index_country - 1]
+#     city_url = 'http:' + link_country[1]
+#     #print(locations)
+#     # find city
+#     locations = get_locations_sinoptik(city_url, refresh=refresh)
+
+#     while locations:
+#         for index, location in enumerate(locations):
+#             print("{}. {}".format((index + 1), (location[0])))
+#         selected_index = int(input('Please select location: '))
+#         location = locations[selected_index - 1]
+#         city_url = 'http:' + location[1]
+#         locations = get_locations_sinoptik(city_url, refresh=refresh)
+#     return locations
+
+#     # self.save_configuration_rp5(*location)
+
+
+# def get_sinoptik_weather(refresh=False):
+#     '''The function returns a list with the value the state of the weather.
+#     '''
+#     weather_info = {}  # create a blank dictionary to enter the weather data
+#     soup = BeautifulSoup(get_page_source(url, refresh=refresh), 'html.parser')
+#     container_tag = soup.find(id="bd1c")
+#     if container_tag:
+#         today_temp = container_tag.find("p", class_="today-temp").get_text()
+#         if today_temp:
+#             weather_info['Temperature: '] = today_temp
+#         img_text = container_tag.find("img").attrs["alt"]
+#         if img_text:
+#             weather_info['Condition: '] = img_text
+
+#     return weather_info
+
+# configurate_sinoptik(refresh=False)
