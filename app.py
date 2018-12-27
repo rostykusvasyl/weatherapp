@@ -46,7 +46,7 @@ class App(object):
         print('{}'.format(location))
         print("_" * 20)
         for key, value, in info.items():
-            print('{0}: {1}'.format(key, value))
+            print('{0:12s} {1}'.format(key, value))
         print("=" * 40, end='\n\n')
 
     def run(self, argv):

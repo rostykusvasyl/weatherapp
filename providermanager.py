@@ -7,6 +7,7 @@ from providers import AccuProvider, Rp5Provider, SinoptikProvider
 class ProviderManager(object):
     ''' Discovers registered providers and loads them.
     '''
+
     def __init__(self):
         self._providers = {}
         self._load_providers()

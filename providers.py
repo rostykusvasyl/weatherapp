@@ -18,12 +18,14 @@ from bs4 import BeautifulSoup
 import config
 
 
+
 class Configure:
     ''' Create configuration file for weather providers.
     '''
     name = 'config'
 
-    def _get_configuration_file(self):
+    @staticmethod
+    def _get_configuration_file():
         ''' The function returns the path to the configuration file.
         '''
 
@@ -41,8 +43,8 @@ class Configure:
             locatoin_config = configuration[config.CONFIG_LOCATION]
             name, url = locatoin_config['name'], locatoin_config['url']
         else:
-             name = self.default_location
-             url = self.default_url
+            name = self.default_location
+            url = self.default_url
         return name, url
 
     def save_configuration(self, name, url):
@@ -67,7 +69,8 @@ class WeatherProvider(Configure):
         self.location = location
         self.url = url
 
-    def get_cache_directory(self):
+    @staticmethod
+    def get_cache_directory():
         '''The function returns the path to the cache directory.
         '''
 
@@ -86,7 +89,8 @@ class WeatherProvider(Configure):
                                            # delete all the files inside
                 cache_dir.rmdir()
 
-    def get_url_hash(self, url):
+    @staticmethod
+    def get_url_hash(url):
         ''' Generates hash for given url.
         '''
 
@@ -104,7 +108,8 @@ class WeatherProvider(Configure):
         with (cache_dir / url_hash).open('wb') as cache_file:
             cache_file.write(page)
 
-    def is_valid(self, path):
+    @staticmethod
+    def is_valid(path):
         '''Check if current cache file is valid.
         '''
 
@@ -184,7 +189,7 @@ class AccuProvider(WeatherProvider, Configure):
             selected_index = int(input('Please select location: '))
             location = locations[selected_index - 1]
             locations = self.get_locations(location[1])
-    
+
             self.save_configuration(*location)
 
     def get_weather_info(self, page):
@@ -293,7 +298,8 @@ class Rp5Provider(WeatherProvider, Configure):
         else:
             self.save_configuration(*region)
 
-    def get_weather_info(self, page):
+    @staticmethod
+    def get_weather_info(page):
         '''The function returns a list with the value the state of the weather.
         '''
 
@@ -415,7 +421,8 @@ class SinoptikProvider(WeatherProvider, Configure):
 
         self.save_configuration(*city)
 
-    def get_weather_info(self, page):
+    @staticmethod
+    def get_weather_info(page):
         '''The function returns a list with the value the state of the weather.
         '''
 
