@@ -72,9 +72,9 @@ class WeatherProvider(Command):
 
     @abc.abstractmethod
     def _get_configuration(self):
-        ''' The function returns data from the configuration file,
+        """ The function returns data from the configuration file,
             if the file is configured, or accepts default data.
-        '''
+        """
 
     @abc.abstractmethod
     def get_weather_info(self, page):
@@ -92,15 +92,15 @@ class WeatherProvider(Command):
 
     @staticmethod
     def get_cache_directory():
-        '''The function returns the path to the cache directory.
-        '''
+        """ The function returns the path to the cache directory.
+        """
 
         return Path.home() / config.CACHE_DIR
 
     @staticmethod
     def remove_cache():
-        ''' Remove cache directory.
-        '''
+        """ Remove cache directory.
+        """
 
         cache_dir = Path.home() / config.CACHE_DIR
         if cache_dir.exists():
@@ -111,14 +111,14 @@ class WeatherProvider(Command):
 
     @staticmethod
     def get_url_hash(url):
-        ''' Generates hash for given url.
-        '''
+        """ Generates hash for given url.
+        """
 
         return hashlib.md5(url.encode('utf-8')).hexdigest()
 
     def save_cache(self, url, page):
-        ''' Save page source by given url address.
-        '''
+        """ Save page source by given url address.
+        """
 
         url_hash = self.get_url_hash(url)
         cache_dir = self.get_cache_directory()
@@ -130,14 +130,14 @@ class WeatherProvider(Command):
 
     @staticmethod
     def is_valid(path):
-        '''Check if current cache file is valid.
-        '''
+        """ Check if current cache file is valid.
+        """
 
         return (time.time() - path.stat().st_mtime) < config.CACHE_TIME
 
     def get_cache(self, url):
-        ''' Return cache data if any.
-        '''
+        """ Return cache data if any.
+        """
 
         cache = b''
         url_hash = self.get_url_hash(url)
@@ -150,8 +150,8 @@ class WeatherProvider(Command):
         return cache
 
     def get_page_source(self, url):
-        '''Get the html-page at the specified url address.
-        '''
+        """ Get the html-page at the specified url address.
+        """
 
         cache = self.get_cache(url)
         if cache and not self.app.options.refresh:
@@ -165,28 +165,28 @@ class WeatherProvider(Command):
         return page.decode('utf-8')
 
     def run(self, argv):
-        ''' Run provider.
-        '''
+        """ Run provider.
+        """
 
         content = self.get_page_source(self.url)
         return self.get_weather_info(content)
 
 
 class Configure(WeatherProvider, Command):
-    ''' Create configuration file for weather providers.
-    '''
+    """ Create configuration file for weather providers.
+    """
 
     @staticmethod
     def _get_configuration_file():
-        ''' The function returns the path to the configuration file.
-        '''
+        """ The function returns the path to the configuration file.
+        """
 
         return Path.home() / config.CONFIG_FILE
 
     def _get_configuration(self):
-        ''' The function returns data from the configuration file,
+        """ The function returns data from the configuration file,
         if the file is configured, or accepts default data.
-        '''
+        """
 
         name = self.get_default_location()
         url = self.get_default_url()
@@ -205,9 +205,9 @@ class Configure(WeatherProvider, Command):
         return name, url
 
     def save_configuration(self, name, url):
-        ''' Write the data received from the user (the city name and its URL)
+        """ Write the data received from the user (the city name and its URL)
         into the configuration file.
-        '''
+        """
 
         parser = configparser.ConfigParser()
         config_file = self._get_configuration_file()
