@@ -45,7 +45,7 @@ RP5_BROWSE_LOCATIONS = ('http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_'
 # A file in which the data about the city and the address for which weather
 # conditions will be displayed will be recorded.
 CONFIG_LOCATION = 'Location'
-CONFIG_FILE_RP5 = 'weather_rp5.ini'
+
 
 
 SINOPTIK_PROVIDER_NAME = 'sinoptik'
@@ -59,4 +59,4 @@ SINOPTIK_BROWSE_LOCATIONS = ('https://ua.sinoptik.ua/%D1%83%D0%BA%D1%80%D'
                              '0%B0%D1%97%D0%BD%D0%B0')
 
 CONFIG_LOCATION = 'Location'
-CONFIG_FILE_SINOPTIK = 'sinoptik.ini'
+
