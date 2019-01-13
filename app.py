@@ -1,16 +1,22 @@
 """ Main application module.
 """
 
-
+import logging
 import sys
 import argparse
 from commandmanager import CommandManager
 from providermanager import ProviderManager
+import config
 
 
 class App:
     """ Weather aggregator application.
     """
+
+    logger = logging.getLogger(__name__)
+    LOG_LEVEL_MAP = {0: logging.WARNING,
+                     1: logging.INFO,
+                     2: logging.DEBUG}
 
     def __init__(self):
         self.arg_parser = self._arg_parser()
@@ -28,12 +34,52 @@ class App:
                                 ' site or "sinoptik" for the sinoptik.ua',
                                 nargs='?')
         arg_parser.add_argument(
-            '--refresh', help='Update cache', action='store_true'   )
+            '--refresh', help='Update cache', action='store_true')
         arg_parser.add_argument(
             '--debug', help='Shows all the error information',
             action='store_true')
+        arg_parser.add_argument(
+            '-v', '--verbose', action='count',
+            dest='verbose_level', default=config.DEFAULT_VERBOSE_LEVEL,
+            help='Increase verbosity of output')
 
         return arg_parser
+
+    def configurate_logging(self):
+        """ Create logging handlers for any log output.
+        """
+
+        # create logger
+        root_logger = logging.getLogger('')
+        root_logger.setLevel(logging.DEBUG)
+
+        # create file write handler and set level to debug
+        file_write = logging.FileHandler(filename="weatherapp.log")
+        file_write.setLevel(logging.DEBUG)
+
+        # create formatter add formatter to file write
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s'
+                                      ' - ' + config.DEFAULT_MESSAGE_FORMAT)
+        file_write.setFormatter(formatter)
+
+        # add file write to logger
+        root_logger.addHandler(file_write)
+
+        # create console handler and set level to debug
+        console = logging.StreamHandler()
+        console_level = self.LOG_LEVEL_MAP.get(self.options.verbose_level,
+                                               logging.WARNING)
+        console.setLevel(console_level)
+
+        # create formatter
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s'
+                                      ' - ' + config.DEFAULT_MESSAGE_FORMAT)
+
+        # add formatter to console
+        console.setFormatter(formatter)
+
+        # add console to logger
+        root_logger.addHandler(console)
 
     @staticmethod
     def output_weather_info(title, location, info):
@@ -56,21 +102,21 @@ class App:
         """
 
         self.options, remaining_args = self.arg_parser.parse_known_args()
+        self.configurate_logging()
+
         command_name = self.options.command
+
 
         if command_name in self.commandmanager:
             command_factory = self.commandmanager.get(command_name)
             try:
                 command_factory(self).run(remaining_args)
             except Exception:
-                print('----------------------------------'
-                      '----------------------------------------')
-                print("The program ended up crashing. Contact developers for "
-                      "more information.!!!")
-                print('----------------------------------'
-                      '----------------------------------------')
+                msg = "Error during command: %s run"
                 if self.options.debug:
-                    raise
+                    self.logger.exception(msg, command_name)
+                else:
+                    self.logger.error(msg, command_name)
 
         if not command_name:
             # run all command providers by default
@@ -81,14 +127,11 @@ class App:
                                              provider(self).location,
                                              provider(self).run(remaining_args))
             except Exception:
-                print('----------------------------------'
-                      '----------------------------------------')
-                print("The program ended up crashing. Contact developers for "
-                      "more information.!!!")
-                print('----------------------------------'
-                      '----------------------------------------')
-            if self.options.debug:
-                raise
+                msg = "Error during command: %s"
+                if self.options.debug:
+                    self.logger.exception(msg, command_name)
+                else:
+                    self.logger.error(msg, command_name)
 
         elif command_name in self.providermanager:
             try:
@@ -97,19 +140,16 @@ class App:
                                          provider.location,
                                          provider.run(remaining_args))
             except Exception:
-                print('----------------------------------'
-                      '----------------------------------------')
-                print("The program ended up crashing. Contact developers for "
-                      "more information.!!!")
-                print('----------------------------------'
-                      '----------------------------------------')
-            if self.options.debug:
-                raise
-
+                msg = "Error during command: %s run"
+                if self.options.debug:
+                    self.logger.exception(msg, command_name)
+                else:
+                    self.logger.error(msg, command_name)
 
 def main(argv):
     """ Main entry point.
     """
+
     try:
         return App().run(argv)
     except KeyboardInterrupt:
