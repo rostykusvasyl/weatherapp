@@ -28,7 +28,7 @@ class App:
                                 ' site or "sinoptik" for the sinoptik.ua',
                                 nargs='?')
         arg_parser.add_argument(
-            '--refresh', help='Update cache', action='store_true')
+            '--refresh', help='Update cache', action='store_true'   )
         arg_parser.add_argument(
             '--debug', help='Shows all the error information',
             action='store_true')
