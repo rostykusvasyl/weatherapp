@@ -4,6 +4,7 @@
 import abc
 import time
 import hashlib
+import logging
 import argparse
 import configparser
 from pathlib import Path
@@ -40,9 +41,10 @@ class Command(abc.ABC):
 
 class WeatherProvider(Command):
     """ Weather provider abstract class.
-
     """
 
+    # create logger
+    logger = logging.getLogger(__name__)
     def __init__(self, app):
         super().__init__(app)
 
@@ -109,10 +111,13 @@ class WeatherProvider(Command):
         try:
             configuration.read(self._get_configuration_file())
         except configparser.Error:
-            print(f"Bad configuration file. "
-                  f"Please reconfigurate your provider: {self.get_name()}")
+            msg = ("Bad configuration file. "
+                   "Please reconfigurate your provider: %s ")
             if self.app.options.debug:
-                raise
+                self.logger.exception(msg, self.get_name())
+            else:
+                self.logger.error(msg, self.get_name())
+
         if config.CONFIG_LOCATION in configuration.sections():
             locatoin_config = configuration[config.CONFIG_LOCATION]
             name, url = locatoin_config['name'], locatoin_config['url']
@@ -130,10 +135,13 @@ class WeatherProvider(Command):
             try:
                 parser.read(config_file)
             except configparser.Error:
-                print(f"Bad configuration file. "
-                      f"Please reconfigurate your provider: {self.get_name()}")
+                msg = ("Bad configuration file. "
+                       "Please reconfigurate your provider: %s ")
                 if self.app.options.debug:
-                    raise
+                    self.logger.exception(msg, self.get_name())
+                else:
+                    self.logger.error(msg, self.get_name())
+
 
         parser[self.get_name()] = {'name': name, 'url': url}
         with open(config_file, 'w') as configfile:
