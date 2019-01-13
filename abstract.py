@@ -23,12 +23,12 @@ class Command(abc.ABC):
         self.app = app
 
     @staticmethod
-    def _arg_parse():
+    def get_parser():
         """ Initialize argument parser for command.
         """
 
-        arg_parser = argparse.ArgumentParser()
-        return arg_parser
+        parser = argparse.ArgumentParser()
+        return parser
 
     @abc.abstractmethod
     def run(self, argv):
@@ -91,23 +91,60 @@ class WeatherProvider(Command):
         """
 
     @staticmethod
+    def _get_configuration_file():
+        """ The function returns the path to the configuration file.
+        """
+
+        return Path.home() / config.CONFIG_FILE
+
+    def _get_configuration(self):
+        """ The function returns data from the configuration file,
+        if the file is configured, or accepts default data.
+        """
+
+        name = self.get_default_location()
+        url = self.get_default_url()
+
+        configuration = configparser.ConfigParser()
+        try:
+            configuration.read(self._get_configuration_file())
+        except configparser.Error:
+            print(f"Bad configuration file. "
+                  f"Please reconfigurate your provider: {self.get_name()}")
+            if self.app.options.debug:
+                raise
+        if config.CONFIG_LOCATION in configuration.sections():
+            locatoin_config = configuration[config.CONFIG_LOCATION]
+            name, url = locatoin_config['name'], locatoin_config['url']
+        return name, url
+
+    def save_configuration(self, name, url):
+        """ Write the data received from the user (the city name and its URL)
+        into the configuration file.
+        """
+
+        parser = configparser.ConfigParser()
+        config_file = self._get_configuration_file()
+
+        if config_file.exists():
+            try:
+                parser.read(config_file)
+            except configparser.Error:
+                print(f"Bad configuration file. "
+                      f"Please reconfigurate your provider: {self.get_name()}")
+                if self.app.options.debug:
+                    raise
+
+        parser[self.get_name()] = {'name': name, 'url': url}
+        with open(config_file, 'w') as configfile:
+            parser.write(configfile)
+
+    @staticmethod
     def get_cache_directory():
         """ The function returns the path to the cache directory.
         """
 
         return Path.home() / config.CACHE_DIR
-
-    @staticmethod
-    def remove_cache():
-        """ Remove cache directory.
-        """
-
-        cache_dir = Path.home() / config.CACHE_DIR
-        if cache_dir.exists():
-            for current_file in cache_dir.iterdir():
-                current_file.unlink()  # To delete a folder you must first
-                                        # delete all the files inside
-            cache_dir.rmdir()
 
     @staticmethod
     def get_url_hash(url):
@@ -172,77 +209,50 @@ class WeatherProvider(Command):
         return self.get_weather_info(content)
 
 
-class Configure(WeatherProvider, Command):
-    """ Create configuration file for weather providers.
+class Manager(abc.ABC):
+    """ Abstract class for project command managers
     """
 
-    @staticmethod
-    def _get_configuration_file():
-        """ The function returns the path to the configuration file.
+    @abc.abstractmethod
+    def add(self, name, command):
+        """ Add new command to manager.
+
+        :param name: command name
+        :type name: str
+        :param command: command class
+        :type command : Sub type of 'weather.abstract.Command'
+
         """
 
-        return Path.home() / config.CONFIG_FILE
+    @abc.abstractmethod
+    def get(self, name):
+        """ Get command from manager by name
 
-    def _get_configuration(self):
-        """ The function returns data from the configuration file,
-        if the file is configured, or accepts default data.
+        :param name: command name
+        :type name: str
+
+            """
+
+    @abc.abstractmethod
+    def __getitem__(self, name):
+        """ Get item by name.
+
+        Implementation of this 'danger' method allow us to access commands
+        by name in the same way at it works in dictionary.
+
+        :param name: command name
+        :type name: str
+
         """
 
-        name = self.get_default_location()
-        url = self.get_default_url()
+    @abc.abstractmethod
+    def __contains__(self, name):
+        """ Check if command with provider name is in manager.
 
-        configuration = configparser.ConfigParser()
-        try:
-            configuration.read(self._get_configuration_file())
-        except configparser.Error:
-            print(f"Bad configuration file. "
-                  f"Please reconfigurate your provider: {self.get_name()}")
-            if self.app.options.debug:
-                raise
-        if config.CONFIG_LOCATION in configuration.sections():
-            locatoin_config = configuration[config.CONFIG_LOCATION]
-            name, url = locatoin_config['name'], locatoin_config['url']
-        return name, url
+        Implementation of this 'danger' method allow us to use 'in'
+        operator with manager to check if command exists in manager.
 
-    def save_configuration(self, name, url):
-        """ Write the data received from the user (the city name and its URL)
-        into the configuration file.
+        :param name: command name
+        :type name: str
+
         """
-
-        parser = configparser.ConfigParser()
-        config_file = self._get_configuration_file()
-
-        if config_file.exists():
-            try:
-                parser.read(config_file)
-            except configparser.Error:
-                print(f"Bad configuration file. "
-                    f"Please reconfigurate your provider: {self.get_name()}")
-                if self.app.options.debug:
-                    raise
-
-        parser[self.get_name()] = {'name': name, 'url': url}
-        with open(config_file, 'w') as configfile:
-            parser.write(configfile)
-
-
-class Providers(Command):
-    """ Displays all existing providers.
-    """
-
-    # def _arg_parse(self):
-    #     """ Initialize argument parser for command "provider".
-    #     """
-
-    #     parser = super(Providers, self)._arg_parse()
-    #     parser.add_argument('provider', help='Command displays all\
-    #                             existing providers.')
-
-    #     return parser
-
-    def run(self, argv):
-        """ Run command
-        """
-
-        for name in self.providermanager._providers:
-            print(name)
