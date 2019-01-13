@@ -4,12 +4,12 @@
 import re
 from pathlib import Path
 from bs4 import BeautifulSoup
-from abstract import WeatherProvider, Configure
+from abstract import WeatherProvider
 
 import config
 
 
-class AccuProvider(Configure, WeatherProvider):
+class AccuProvider(WeatherProvider):
     """ Weather provider for AccuWeather site.
     """
 
@@ -100,7 +100,7 @@ class AccuProvider(Configure, WeatherProvider):
                 return weather_info
 
 
-class Rp5Provider(Configure, WeatherProvider):
+class Rp5Provider(WeatherProvider):
     """ Weather provider for rp5.ua site.
     """
 
@@ -243,7 +243,7 @@ class Rp5Provider(Configure, WeatherProvider):
         return weather_info
 
 
-class SinoptikProvider(Configure, WeatherProvider):
+class SinoptikProvider(WeatherProvider):
     """ Weather provider for AccuWeather site.
     """
 
