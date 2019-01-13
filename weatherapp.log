@@ -1,8 +1,0 @@
-2019-01-13 22:48:00,561 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): www.accuweather.com:443
-2019-01-13 22:48:01,569 - urllib3.connectionpool - DEBUG - https://www.accuweather.com:443 "GET /uk/ua/brody/324506/weather-forecast/324506 HTTP/1.1" 200 29017
-2019-01-13 22:48:01,679 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): www.accuweather.com:443
-2019-01-13 22:48:02,278 - urllib3.connectionpool - DEBUG - https://www.accuweather.com:443 "GET /uk/ua/brody/324506/current-weather/324506 HTTP/1.1" 200 26859
-2019-01-13 22:52:23,484 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): rp5.ua:80
-2019-01-13 22:52:23,614 - urllib3.connectionpool - DEBUG - http://rp5.ua:80 "GET /%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%91%D1%80%D0%BE%D0%B4%D0%B0%D1%85,_%D0%9B%D1%8C%D0%B2%D1%96%D0%B2%D1%81%D1%8C%D0%BA%D0%B0_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C HTTP/1.1" 200 None
-2019-01-13 22:52:24,042 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): ua.sinoptik.ua:443
-2019-01-13 22:52:24,331 - urllib3.connectionpool - DEBUG - https://ua.sinoptik.ua:443 "GET /%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0-%D0%B1%D1%80%D0%BE%D0%B4%D0%B8 HTTP/1.1" 200 None
