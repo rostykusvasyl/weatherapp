@@ -1,6 +1,10 @@
 """ Module contains constants (default values).
 """
 
+# application default verbose and log levels
+DEFAULT_VERBOSE_LEVEL = 0
+DEFAULT_MESSAGE_FORMAT = '%(message)s'
+
 # AccuWeather provider reloaded configuration.
 ACCU_PROVIDER_NAME = 'accu'
 ACCU_PRVIDER_TITLE = 'AccuWeather'
