@@ -6,7 +6,6 @@ from weatherapp.core import abstract
 
 
 class CommandManager(abstract.Manager):
-
     """ Manager for app commands.
     """
 
