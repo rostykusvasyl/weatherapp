@@ -1,10 +1,8 @@
 """ Module container for providers.
 """
 
-
 from weatherapp.core.providers import accuprovider, rp5provider,\
     sinoptikprovider
-
 from weatherapp.core import commandmanager
 
 
