@@ -89,7 +89,7 @@ class App:
         """
 
         print('{}:'.format(title))
-        print("#" * 10, end='\n\n')
+        print("#" * 10, end='\n \n')
 
         print('{}'.format(location))
         print("_" * 20)
