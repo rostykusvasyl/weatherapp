@@ -1,4 +1,1 @@
-weatherapp - це програма для відображення інформації про погоду з заданих сайтів.
-Програма матиме простий інтерфейс користування - інформація буде відображатися в консолі. Програма буде реалізована таким чином, що додавання нового ресурсу не буде
-змінювати реалізації основного функціоналу, а лише підключатиметься новий
-модуль як плагін.
+Weatherapp is a program for displaying weather information from sites: accuweather.com/, rp5.ua/ and sinoptik.ua/. All weather information is displayed in the console. You can also set the location for which you want to see the weather information in the configuration of the program. The program is implemented in such a way that it is possible to add a new weather provider as a plug-in.
