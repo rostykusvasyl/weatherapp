@@ -51,16 +51,15 @@ RP5_BROWSE_LOCATIONS = ('http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_'
 CONFIG_LOCATION = 'Location'
 
 
-
 SINOPTIK_PROVIDER_NAME = 'sinoptik'
 SINOPTIK_PROVIDER_TITLE = 'sinoptik.ua'
 
 DEFAULT_SINOPTIK_LOCATION_NAME = 'Brody'
-DEFAULT_SINOPTIK_LOCATION_URL = ('https://ua.sinoptik.ua/%D0%BF%D0%BE%D0%B3%D0%BE%D0%B'
-                        '4%D0%B0-%D0%B1%D1%80%D0%BE%D0%B4%D0%B8')
+DEFAULT_SINOPTIK_LOCATION_URL = ('https://ua.sinoptik.ua/%D0%BF%D'
+                                 '0%BE%D0%B3%D0%BE%D0%B4%D0%B0-%D'
+                                 '0%B1%D1%80%D0%BE%D0%B4%D0%B8')
 
 SINOPTIK_BROWSE_LOCATIONS = ('https://ua.sinoptik.ua/%D1%83%D0%BA%D1%80%D'
                              '0%B0%D1%97%D0%BD%D0%B0')
 
 CONFIG_LOCATION = 'Location'
-

@@ -1,42 +1,14 @@
-""" Abstract classes for project.
-"""
-
 import abc
 import time
 import hashlib
 import logging
-import argparse
 import configparser
 from pathlib import Path
+
 import requests
 
-import config
-
-
-class Command(abc.ABC):
-    """ Base class for commands.
-
-    :param app: Main application instance
-    :type app: app.App
-    """
-
-    def __init__(self, app):
-        self.app = app
-
-    @staticmethod
-    def get_parser():
-        """ Initialize argument parser for command.
-        """
-
-        parser = argparse.ArgumentParser()
-        return parser
-
-    @abc.abstractmethod
-    def run(self, argv):
-        """ Invoked by application when the command is run.
-
-        Should be overriden in subclass.
-        """
+from weatherapp.core import config
+from weatherapp.core.abstract.command import Command
 
 
 class WeatherProvider(Command):
@@ -45,6 +17,7 @@ class WeatherProvider(Command):
 
     # create logger
     logger = logging.getLogger(__name__)
+
     def __init__(self, app):
         super().__init__(app)
 
@@ -81,19 +54,19 @@ class WeatherProvider(Command):
     @abc.abstractmethod
     def get_weather_info(self, page):
         """ Collects weather information.
-    Gets weather information from source and produce it in the following
-    format.
+        Gets weather information from source and produce it in the following
+        format.
 
-    weather_info = {
-        'cond':      ''    # weather condition
-        'temp':      ''    # temperature
-        'feels_like' ''    # feels like temperature
-        'wind'       ''    # information about wind
-    }
+        weather_info = {
+            'cond':      ''    # weather condition
+            'temp':      ''    # temperature
+            'feels_like' ''    # feels like temperature
+            'wind'       ''    # information about wind
+        }
         """
 
     @staticmethod
-    def _get_configuration_file():
+    def get_configuration_file():
         """ The function returns the path to the configuration file.
         """
 
@@ -109,7 +82,7 @@ class WeatherProvider(Command):
 
         configuration = configparser.ConfigParser()
         try:
-            configuration.read(self._get_configuration_file())
+            configuration.read(self.get_configuration_file())
         except configparser.Error:
             msg = ("Bad configuration file. "
                    "Please reconfigurate your provider: %s ")
@@ -118,8 +91,8 @@ class WeatherProvider(Command):
             else:
                 self.logger.error(msg, self.get_name())
 
-        if config.CONFIG_LOCATION in configuration.sections():
-            locatoin_config = configuration[config.CONFIG_LOCATION]
+        if self.get_name() in configuration.sections():
+            locatoin_config = configuration[self.get_name()]
             name, url = locatoin_config['name'], locatoin_config['url']
         return name, url
 
@@ -129,19 +102,10 @@ class WeatherProvider(Command):
         """
 
         parser = configparser.ConfigParser()
-        config_file = self._get_configuration_file()
+        config_file = self.get_configuration_file()
 
         if config_file.exists():
-            try:
-                parser.read(config_file)
-            except configparser.Error:
-                msg = ("Bad configuration file. "
-                       "Please reconfigurate your provider: %s ")
-                if self.app.options.debug:
-                    self.logger.exception(msg, self.get_name())
-                else:
-                    self.logger.error(msg, self.get_name())
-
+            parser.read(config_file)
 
         parser[self.get_name()] = {'name': name, 'url': url}
         with open(config_file, 'w') as configfile:
@@ -215,52 +179,3 @@ class WeatherProvider(Command):
 
         content = self.get_page_source(self.url)
         return self.get_weather_info(content)
-
-
-class Manager(abc.ABC):
-    """ Abstract class for project command managers
-    """
-
-    @abc.abstractmethod
-    def add(self, name, command):
-        """ Add new command to manager.
-
-        :param name: command name
-        :type name: str
-        :param command: command class
-        :type command : Sub type of 'weather.abstract.Command'
-
-        """
-
-    @abc.abstractmethod
-    def get(self, name):
-        """ Get command from manager by name
-
-        :param name: command name
-        :type name: str
-
-            """
-
-    @abc.abstractmethod
-    def __getitem__(self, name):
-        """ Get item by name.
-
-        Implementation of this 'danger' method allow us to access commands
-        by name in the same way at it works in dictionary.
-
-        :param name: command name
-        :type name: str
-
-        """
-
-    @abc.abstractmethod
-    def __contains__(self, name):
-        """ Check if command with provider name is in manager.
-
-        Implementation of this 'danger' method allow us to use 'in'
-        operator with manager to check if command exists in manager.
-
-        :param name: command name
-        :type name: str
-
-        """

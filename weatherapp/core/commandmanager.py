@@ -1,9 +1,8 @@
 """ Manager for app commands.
 """
 
-from commands import Configurate, Providers, ClearCache
-
-import abstract
+from weatherapp.core.commands import Configurate, Providers, ClearCache
+from weatherapp.core import abstract
 
 
 class CommandManager(abstract.Manager):

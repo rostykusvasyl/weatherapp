@@ -1,9 +1,11 @@
 """ Module container for providers.
 """
 
-from providers import AccuProvider, Rp5Provider, SinoptikProvider
 
-import commandmanager
+from weatherapp.core.providers import accuprovider, rp5provider,\
+    sinoptikprovider
+
+from weatherapp.core import commandmanager
 
 
 class ProviderManager(commandmanager.CommandManager):
@@ -14,5 +16,6 @@ class ProviderManager(commandmanager.CommandManager):
         """ Loads all existing providers.
         """
 
-        for provider in [AccuProvider, Rp5Provider, SinoptikProvider]:
+        for provider in [accuprovider.AccuProvider, rp5provider.Rp5Provider,
+                         sinoptikprovider.SinoptikProvider]:
             self.add(provider.name, provider)

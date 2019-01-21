@@ -1,12 +1,14 @@
 """ Main application module.
 """
 
-import logging
 import sys
-import argparse
-from commandmanager import CommandManager
-from providermanager import ProviderManager
-import config
+import logging
+from argparse import ArgumentParser
+
+# from weatherapp.core.formatters import TableFormatter
+from weatherapp.core import config
+from weatherapp.core.commandmanager import CommandManager
+from weatherapp.core.providermanager import ProviderManager
 
 
 class App:
@@ -23,12 +25,11 @@ class App:
         self.providermanager = ProviderManager()
         self.commandmanager = CommandManager()
 
-    @staticmethod
-    def _arg_parser():
-        """
+    def _arg_parser(self):
+        """ Initialize argument parser.
         """
 
-        arg_parser = argparse.ArgumentParser()
+        arg_parser = ArgumentParser(add_help=False)
         arg_parser.add_argument('command', help='Enter "accu" for the '
                                 'Accuwether website or "rp5" for the Rp5'
                                 ' site or "sinoptik" for the sinoptik.ua',
@@ -93,7 +94,7 @@ class App:
         print('{}'.format(location))
         print("_" * 20)
         for key, value, in info.items():
-            print('{0:12s} {1}'.format(key, value))
+            print(f'{key}: {value}')
         print("=" * 40, end='\n\n')
 
     def run(self, argv):
@@ -105,7 +106,6 @@ class App:
         self.configurate_logging()
 
         command_name = self.options.command
-
 
         if command_name in self.commandmanager:
             command_factory = self.commandmanager.get(command_name)
@@ -125,7 +125,8 @@ class App:
                 for provider in self.providermanager._commands.values():
                     self.output_weather_info(provider(self).title,
                                              provider(self).location,
-                                             provider(self).run(remaining_args))
+                                             provider(self).run(remaining_args)
+                                             )
             except Exception:
                 msg = "Error during command: %s"
                 if self.options.debug:
@@ -146,8 +147,9 @@ class App:
                 else:
                     self.logger.error(msg, command_name)
 
-def main(argv):
-    """ Main entry point.
+
+def main(argv=sys.argv[1:]):
+    """ Margv=sys.argv[1:]ain entry point.
     """
 
     try:
