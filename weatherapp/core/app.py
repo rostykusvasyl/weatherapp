@@ -5,7 +5,7 @@ import sys
 import logging
 from argparse import ArgumentParser
 
-# from weatherapp.core.formatters import TableFormatter
+from weatherapp.core.formatters import TableFormatter
 from weatherapp.core import config
 from weatherapp.core.commandmanager import CommandManager
 from weatherapp.core.providermanager import ProviderManager
@@ -21,9 +21,13 @@ class App:
                      2: logging.DEBUG}
 
     def __init__(self):
+        self.stdin = stdin or sys.stdin
+        self.stdout = stdout or sys.stdout
+        self.stderr = stderr or sys.stderr
         self.arg_parser = self._arg_parser()
         self.providermanager = ProviderManager()
         self.commandmanager = CommandManager()
+        self.formatters = self._load_formatters()
 
     def _arg_parser(self):
         """ Initialize argument parser.
@@ -43,8 +47,15 @@ class App:
             '-v', '--verbose', action='count',
             dest='verbose_level', default=config.DEFAULT_VERBOSE_LEVEL,
             help='Increase verbosity of output')
+        arg_parser.add_argument('-f', '--formatter', action='store',
+                                default='table', help="Output format,"
+                                "defaults to table")
 
         return arg_parser
+
+    @staticmethod
+    def _load_formatters():
+        return {'table': TableFormatter}
 
     def configurate_logging(self):
         """ Create logging handlers for any log output.
@@ -83,19 +94,16 @@ class App:
         root_logger.addHandler(console)
 
     @staticmethod
-    def output_weather_info(title, location, info):
+    def output_weather_info(self, title, location, data):
         """ Displays the result of the received values the state of
             the weather.
         """
 
-        print('{}:'.format(title))
-        print("#" * 10, end='\n \n')
+        formatter = self.formatters.get(self.options.formatter, 'table')()
+        columns = [title, location]
 
-        print('{}'.format(location))
-        print("_" * 20)
-        for key, value, in info.items():
-            print(f'{key}: {value}')
-        print("=" * 40, end='\n\n')
+        self.stdout.write(formatter.emit(columns, data))
+        self.stdout.write('\n')
 
     def run(self, argv):
         """ Run application.
