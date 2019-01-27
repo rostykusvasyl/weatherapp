@@ -1,7 +1,6 @@
 """ Weather provider.
 """
 
-from pathlib import Path
 from bs4 import BeautifulSoup
 
 from weatherapp.core import config
@@ -67,7 +66,8 @@ class SinoptikProvider(WeatherProvider):
         # Find continent
         list_continent = self.get_link_continent()
         for index, location in enumerate(list_continent):
-            print("{}. {}".format((index + 1), (location[0])))
+            self.app.stdout.write("{}. {} \n".format((index + 1),
+                                                     (location[0])))
         while True:
             try:
                 index_continent =\
@@ -76,16 +76,17 @@ class SinoptikProvider(WeatherProvider):
                     link_continent = list_continent[index_continent - 1]
                     break
             except ValueError:
-                print("That was no valid number. Try again...")
+                self.app.stdout.write("That was no valid number. Try again...")
             except IndexError:
-                print("This number out of range. Try again...")
+                self.app.stdout.write("This number out of range. Try again...")
 
         continent_url = 'http:' + link_continent[1]
 
         # find counrty
         list_country = self.get_link_country(continent_url)
         for index, location in enumerate(list_country):
-            print("{}. {}".format((index + 1), (location[0])))
+            self.app.stdout.write("{}. {} \n".format((index + 1),
+                                                     (location[0])))
         while True:
             try:
                 index_country =\
@@ -94,16 +95,17 @@ class SinoptikProvider(WeatherProvider):
                     link_country = list_country[index_country - 1]
                     break
             except ValueError:
-                print("That was no valid number. Try again...")
+                self.app.stdout.write("That was no valid number. Try again...")
             except IndexError:
-                print("This number out of range. Try again...")
+                self.app.stdout.write("This number out of range. Try again...")
 
         country_url = 'http:' + link_country[1]
 
         # Find region
         list_region = self.get_link_country(country_url)
         for index, location in enumerate(list_region):
-            print("{}. {}".format((index + 1), (location[0])))
+            self.app.stdout.write("{}. {} \n".format((index + 1),
+                                                     (location[0])))
         while True:
             try:
                 index_region = int(input('Please select region location: '))
@@ -111,9 +113,9 @@ class SinoptikProvider(WeatherProvider):
                     link_region = list_region[index_region - 1]
                     break
             except ValueError:
-                print("That was no valid number. Try again...")
+                self.app.stdout.write("That was no valid number. Try again...")
             except IndexError:
-                print("This number out of range. Try again...")
+                self.app.stdout.write("This number out of range. Try again...")
 
         location_region = 'http:' + link_region[1]
 
@@ -128,7 +130,8 @@ class SinoptikProvider(WeatherProvider):
             location = link.get_text()
             list_city.append((location, url))
         for index, location in enumerate(list_city):
-            print("{}. {}".format((index + 1), (location[0])))
+            self.app.stdout.write("{}. {} \n".format((index + 1),
+                                                     (location[0])))
         while True:
             try:
                 index_city = int(input('Please select city location: '))
@@ -136,9 +139,9 @@ class SinoptikProvider(WeatherProvider):
                     city = list_city[index_city - 1]
                     break
             except ValueError:
-                print("That was no valid number. Try again...")
+                self.app.stdout.write("That was no valid number. Try again...")
             except IndexError:
-                print("This number out of range. Try again...")
+                self.app.stdout.write("This number out of range. Try again...")
 
         self.save_configuration(*city)
 
@@ -161,7 +164,7 @@ class SinoptikProvider(WeatherProvider):
             if realfeel:
                 weather_info['feels_like'] = realfeel
             cond_info = \
-                container_tag.find(class_="weatherIco n400").attrs["title"]
+                container_tag.find(class_="weatherIco d400").attrs["title"]
             if cond_info:
                 weather_info['cond'] = cond_info
             wind_tag = container_tag.find(class_="weatherDetails")
