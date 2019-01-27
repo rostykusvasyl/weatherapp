@@ -1,4 +1,3 @@
-
 import abc
 
 
@@ -8,7 +7,7 @@ class Formatter(abc.ABC):
     """
 
     @abc.abstractmethod
-    def emit(self, column_names, data, stdout):
+    def emit(self, column_names, data):
         """ Format and print data from the iterable source.
 
         :param column_names: names of the columns
