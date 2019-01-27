@@ -57,7 +57,8 @@ class Rp5Provider(WeatherProvider):
             link = link.find(["a", "span"]).get_text()
             list_country.append((link, url))
         for index_country, location in enumerate(list_country):
-            print("{}. {}".format((index_country + 1), (location[0])))
+            self.app.stdout.write("{}. {} \n".format((index_country + 1),
+                                                     (location[0])))
         while True:
             try:
                 index_country = \
@@ -66,16 +67,17 @@ class Rp5Provider(WeatherProvider):
                     link_country = list_country[index_country - 1]
                     break
             except ValueError:
-                print("That was no valid number. Try again...")
+                self.app.stdout.write("That was no valid number. Try again...")
             except IndexError:
-                print("This number out of range. Try again...")
+                self.app.stdout.write("This number out of range. Try again...")
 
         country_url = 'http://rp5.ua' + link_country[1]
 
         # Find region
         locations = self.get_locations_region(country_url)
         for index_region, location in enumerate(locations):
-            print("{}. {}".format((index_region + 1), (location[0])))
+            self.app.stdout.write("{}. {} \n".format((index_region + 1),
+                                                     (location[0])))
         while True:
             try:
                 index_region = int(input('Please select location region: '))
@@ -83,9 +85,9 @@ class Rp5Provider(WeatherProvider):
                     region = locations[index_region - 1]
                     break
             except ValueError:
-                print("That was no valid number. Try again...")
+                self.app.stdout.write("That was no valid number. Try again...")
             except IndexError:
-                print("This number out of range. Try again...")
+                self.app.stdout.write("This number out of range. Try again...")
 
         region_url = region[1]
 
@@ -102,7 +104,8 @@ class Rp5Provider(WeatherProvider):
                 location = location.find(class_="href20").get_text()
                 list_city.append((location, url))
             for index_city, location in enumerate(list_city):
-                print("{}. {}".format((index_city + 1), (location[0])))
+                self.app.stdout.write("{}. {} \n".format((index_city + 1),
+                                                         (location[0])))
             while True:
                 try:
                     index_city = int(input('Please select city: '))
@@ -110,9 +113,11 @@ class Rp5Provider(WeatherProvider):
                         city = list_city[index_city - 1]
                         break
                 except ValueError:
-                    print("That was no valid number. Try again...")
+                    self.app.stdout.write("That was no valid number."
+                                          "Try again...")
                 except IndexError:
-                    print("This number out of range. Try again...")
+                    self.app.stdout.write("This number out of range."
+                                          "Try again...")
 
             self.save_configuration(*city)
         elif city_link:
@@ -121,7 +126,8 @@ class Rp5Provider(WeatherProvider):
                 location = location.find("a").get_text()
                 list_city.append((location, url))
             for index_city, location in enumerate(list_city):
-                print("{}. {}".format((index_city + 1), (location[0])))
+                self.app.stdout.write("{}. {}".format((index_city + 1),
+                                                      (location[0])))
             while True:
                 try:
                     index_city = int(input('Please select city: '))
@@ -129,9 +135,11 @@ class Rp5Provider(WeatherProvider):
                         city = list_city[index_city - 1]
                         break
                 except ValueError:
-                    print("That was no valid number. Try again...")
+                    self.app.stdout.write("That was no valid number."
+                                          "Try again...")
                 except IndexError:
-                    print("This number out of range. Try again...")
+                    self.app.stdout.write("This number out of range."
+                                          "Try again...")
 
             self.save_configuration(*city)
         else:
@@ -139,7 +147,8 @@ class Rp5Provider(WeatherProvider):
 
     @staticmethod
     def get_weather_info(page):
-        """ The function returns a list with the value the state of the weather.
+        """ The function returns a list with the value
+        the state of the weather.
         """
 
         # create a blank dictionary to enter the weather data
@@ -166,6 +175,6 @@ class Rp5Provider(WeatherProvider):
         if forecast_wind:
             lst_forecast = forecast_wind.split(',')
             wind = lst_forecast[-2].strip()[:lst_forecast[-2].find(')') + 1] +\
-                lst_forecast[-1].strip()
+                lst_forecast[-1].strip()[:lst_forecast[-1].find('.') + 1]
             weather_info['wind'] = wind
         return weather_info
