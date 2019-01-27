@@ -1,3 +1,4 @@
+import sys
 from weatherapp.core.abstract import Command
 
 
@@ -12,4 +13,5 @@ class Providers(Command):
         """
 
         for name in self.app.providermanager._commands:
-            print(name)
+            sys.stdout.write(name.title)
+            sys.stdout.write('\n')
