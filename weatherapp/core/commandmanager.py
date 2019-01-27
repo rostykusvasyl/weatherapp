@@ -1,7 +1,8 @@
 """ Manager for app commands.
 """
 
-from weatherapp.core.commands import Configurate, Providers, ClearCache
+from weatherapp.core.commands import Configurate, Providers, ClearCache,\
+    CsvWrite
 from weatherapp.core import abstract
 
 
@@ -27,7 +28,7 @@ class CommandManager(abstract.Manager):
     def _load_commands(self):
         """Load all external (from an entrypoints) commands."""
 
-        for command in [Configurate, Providers, ClearCache]:
+        for command in [Configurate, Providers, ClearCache, CsvWrite]:
             self.add(command.name, command)
 
     def get(self, name):
