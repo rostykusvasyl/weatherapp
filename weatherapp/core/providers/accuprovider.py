@@ -52,7 +52,8 @@ class AccuProvider(WeatherProvider):
         locations = self.get_locations(config.ACCU_BROWSE_LOCATIONS)
         while locations:
             for index, location in enumerate(locations):
-                print("{}. {}".format((index + 1), (location[0])))
+                self.app.stdout.write("{}. {} \n".format((index + 1),
+                                                         (location[0])))
             while True:
                 try:
                     selected_index = int(input('Please select location'
@@ -61,9 +62,9 @@ class AccuProvider(WeatherProvider):
                         location = locations[selected_index - 1]
                         break
                 except ValueError:
-                    print("That was no valid number. Try again...")
+                    self.stdout.write("That was no valid number. Try again...")
                 except IndexError:
-                    print("This number out of range. Try again...")
+                    self.stdout.write("This number out of range. Try again...")
 
             locations = self.get_locations(location[1])
 
