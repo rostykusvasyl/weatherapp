@@ -5,7 +5,7 @@ import sys
 import logging
 from argparse import ArgumentParser
 
-from weatherapp.core.formatters import TableFormatter
+from weatherapp.core.formatters import TableFormatter, CsvFormatter
 from weatherapp.core import config
 from weatherapp.core.commandmanager import CommandManager
 from weatherapp.core.providermanager import ProviderManager
@@ -20,7 +20,7 @@ class App:
                      1: logging.INFO,
                      2: logging.DEBUG}
 
-    def __init__(self):
+    def __init__(self, stdin=None, stdout=None, stderr=None):
         self.stdin = stdin or sys.stdin
         self.stdout = stdout or sys.stdout
         self.stderr = stderr or sys.stderr
@@ -28,6 +28,7 @@ class App:
         self.providermanager = ProviderManager()
         self.commandmanager = CommandManager()
         self.formatters = self._load_formatters()
+        self.options = self.arg_parser.parse_args()
 
     def _arg_parser(self):
         """ Initialize argument parser.
@@ -43,19 +44,22 @@ class App:
         arg_parser.add_argument(
             '--debug', help='Shows all the error information',
             action='store_true')
+        arg_parser.add_argument('clear_cache', help='Remove cache \
+                        directory', action='store_true')
         arg_parser.add_argument(
             '-v', '--verbose', action='count',
             dest='verbose_level', default=config.DEFAULT_VERBOSE_LEVEL,
             help='Increase verbosity of output')
-        arg_parser.add_argument('-f', '--formatter', action='store',
-                                default='table', help="Output format,"
-                                "defaults to table")
+        arg_parser.add_argument('-f', '--formatter', nargs='?',
+                                help="Output format, defaults to table")
+        arg_parser.add_argument('csv_write', help='Writing weather data \
+                                in .csv format.', action='store_true')
 
         return arg_parser
 
     @staticmethod
     def _load_formatters():
-        return {'table': TableFormatter}
+        return {'csvtable': CsvFormatter, 'table': TableFormatter}
 
     def configurate_logging(self):
         """ Create logging handlers for any log output.
@@ -93,17 +97,35 @@ class App:
         # add console to logger
         root_logger.addHandler(console)
 
-    @staticmethod
     def output_weather_info(self, title, location, data):
         """ Displays the result of the received values the state of
             the weather.
         """
 
-        formatter = self.formatters.get(self.options.formatter, 'table')()
-        columns = [title, location]
+        if self.options.formatter == 'csvtable':
+            formatter = \
+                self.formatters.get(self.options.formatter, 'csvtable')()
+            columns = [title, location]
+            formatter.emit(columns, data)
+            self.stdout.write('\n')
 
-        self.stdout.write(formatter.emit(columns, data))
-        self.stdout.write('\n')
+        elif self.options.formatter == 'table':
+            formatter = self.formatters.get(self.options.formatter, 'table')()
+            columns = [title, location]
+            self.stdout.write(formatter.emit(columns, data))
+            self.stdout.write('\n')
+
+        else:
+            self.stdout.write('{}:\n'.format(title))
+            self.stdout.write('*' * 12)
+            self.stdout.write('\n')
+            self.stdout.write('{}\n'.format(location))
+            self.stdout.write("_" * 20)
+            self.stdout.write('\n')
+            for key, value, in data.items():
+                self.stdout.write('{0}: {1} \n'.format(key, value))
+            self.stdout.write("=" * 40)
+            self.stdout.write('\n\n')
 
     def run(self, argv):
         """ Run application.
@@ -114,11 +136,10 @@ class App:
         self.configurate_logging()
 
         command_name = self.options.command
-
         if command_name in self.commandmanager:
             command_factory = self.commandmanager.get(command_name)
             try:
-                command_factory(self).run(remaining_args)
+                command_factory(self).run(argv)
             except Exception:
                 msg = "Error during command: %s run"
                 if self.options.debug:
@@ -163,7 +184,8 @@ def main(argv=sys.argv[1:]):
     try:
         return App().run(argv)
     except KeyboardInterrupt:
-        print(" Oops!!! Something went wrong. Please restart your program.")
+        sys.stdout.write(" Oops!!! Something went wrong."
+                         "Please restart your program.")
 
 
 if __name__ == '__main__':
