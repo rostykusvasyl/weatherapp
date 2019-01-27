@@ -6,7 +6,9 @@ class TableFormatter(Formatter):
     """ Table formatter for app output.
     """
 
-    def emit(self, column_names, data, stdout):
+    name = 'table'
+
+    def emit(self, column_names, data):
         """ Format and print data from the iterable source.
 
         :param column_names: names of the columns
@@ -17,14 +19,12 @@ class TableFormatter(Formatter):
 
         """
 
-        pt = prettytable.PrettyTable
+        pt = prettytable.PrettyTable()
 
         for column, values in zip(column_names, (data.keys(), data.values())):
             if any(values):
-                pt.add_column(column, values)
+                pt.add_column(column, list(values))
 
         pt.align = 'l'
         pt.padding_width = 1
-        # pt.hrules = 2
-        # pt.vrules = 0
         return pt.get_string()
