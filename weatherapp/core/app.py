@@ -30,7 +30,8 @@ class App:
         self.formatters = self._load_formatters()
         self.options = self.arg_parser.parse_args()
 
-    def _arg_parser(self):
+    @staticmethod
+    def _arg_parser():
         """ Initialize argument parser.
         """
 
@@ -151,7 +152,7 @@ class App:
             # run all command providers by default
 
             try:
-                for provider in self.providermanager._commands.values():
+                for name, provider in self.providermanager:
                     self.output_weather_info(provider(self).title,
                                              provider(self).location,
                                              provider(self).run(remaining_args)
