@@ -168,7 +168,28 @@ class WeatherProvider(Command):
         else:
             headers = \
                 {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64;)'}
-            page = requests.get(url, headers=headers)
+            try:
+                page = requests.get(url, headers=headers, timeout=5)
+            except requests.ConnectionError as msg:
+                self.app.stdout.write("OOPS!! Connection Error. Make sure you"
+                                      "are connected to Internet. Technical"
+                                      "Details given below. \n")
+                if self.app.options.debug:
+                    self.logger.exception(msg)
+                else:
+                    self.logger.error(msg)
+            except requests.Timeout as msg:
+                self.app.stdout.write("OOPS!! Timeout Error")
+                if self.app.options.debug:
+                    self.logger.exception(msg)
+                else:
+                    self.logger.error(msg)
+            except requests.RequestException as msg:
+                self.app.stdout.write("OOPS!! General Error")
+                if self.app.options.debug:
+                    self.logger.exception(msg)
+                else:
+                    self.logger.error(msg)
             page = page.content
             self.save_cache(url, page)
         return page.decode('utf-8')
