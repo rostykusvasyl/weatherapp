@@ -45,16 +45,12 @@ class App:
         arg_parser.add_argument(
             '--debug', help='Shows all the error information',
             action='store_true')
-        arg_parser.add_argument('clear_cache', help='Remove cache \
-                        directory', action='store_true')
         arg_parser.add_argument(
             '-v', '--verbose', action='count',
             dest='verbose_level', default=config.DEFAULT_VERBOSE_LEVEL,
             help='Increase verbosity of output')
         arg_parser.add_argument('-f', '--formatter', nargs='?',
                                 help="Output format, defaults to table")
-        arg_parser.add_argument('csv_write', help='Writing weather data \
-                                in .csv format.', action='store_true')
 
         return arg_parser
 
@@ -128,65 +124,69 @@ class App:
             self.stdout.write("=" * 40)
             self.stdout.write('\n\n')
 
+    def run_command(self, name, argv):
+        """ Run command
+        """
+        command = self.commandmanager.get(name)
+        try:
+            command(self).run(argv)
+        except Exception:
+            msg = "Error during command: %s run"
+            if self.options.debug:
+                self.logger.exception(msg, name)
+            else:
+                self.logger.error(msg, name)
+
+    def run_provider(self, name, argv):
+        """ Run specified provider
+        """
+
+        provider = self.providermanager.get(name)
+        if provider:
+            provider = provider(self)
+            self.output_weather_info(provider.title,
+                                     provider.location,
+                                     provider.run(argv))
+
+    def run_providers(self, argv):
+        """ Execute all available providers.
+        """
+
+        for name, provider in self.providermanager:
+            provider = provider(self)
+            self.output_weather_info(provider.title,
+                                     provider.location,
+                                     provider.run(argv))
+
+
     def run(self, argv):
         """ Run application.
         :param argv: list of passed arguments
         """
 
-        self.options, remaining_args = self.arg_parser.parse_known_args()
+        self.options, remaining_args = self.arg_parser.parse_known_args(argv)
         self.configurate_logging()
 
         command_name = self.options.command
-        if command_name in self.commandmanager:
-            command_factory = self.commandmanager.get(command_name)
-            try:
-                command_factory(self).run(argv)
-            except Exception:
-                msg = "Error during command: %s run"
-                if self.options.debug:
-                    self.logger.exception(msg, command_name)
-                else:
-                    self.logger.error(msg, command_name)
-
         if not command_name:
-            # run all command providers by default
+            # run all providers
+            return self.run_providers(remaining_args)
 
-            try:
-                for name, provider in self.providermanager:
-                    self.output_weather_info(provider(self).title,
-                                             provider(self).location,
-                                             provider(self).run(remaining_args)
-                                             )
-            except Exception:
-                msg = "Error during command: %s"
-                if self.options.debug:
-                    self.logger.exception(msg, command_name)
-                else:
-                    self.logger.error(msg, command_name)
+        if command_name in self.commandmanager:
+            return self.run_command(command_name, remaining_args)
 
-        elif command_name in self.providermanager:
-            try:
-                provider = self.providermanager[command_name](self)
-                self.output_weather_info(provider.title,
-                                         provider.location,
-                                         provider.run(remaining_args))
-            except Exception:
-                msg = "Error during command: %s run"
-                if self.options.debug:
-                    self.logger.exception(msg, command_name)
-                else:
-                    self.logger.error(msg, command_name)
+        if command_name in self.providermanager:
+            return self.run_provider(command_name, remaining_args)
 
 
 def main(argv=sys.argv[1:]):
-    """ Margv=sys.argv[1:]ain entry point.
+    """ Main entry point.
     """
 
     try:
         return App().run(argv)
     except KeyboardInterrupt:
-        sys.stdout.write(" Oops!!! Something went wrong."
-                         "Please restart your program.")
+        sys.stdout.write(" Oops!!! Someone closed the program.")
 
 
 if __name__ == '__main__':
