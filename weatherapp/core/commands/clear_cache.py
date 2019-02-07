@@ -1,3 +1,7 @@
+""" Remove cache directory.
+"""
+
+
 from pathlib import Path
 
 from weatherapp.core.abstract import Command
@@ -20,4 +24,4 @@ class ClearCache(Command):
                 # To delete a folder you must first delete all the files inside
                 current_file.unlink()
             cache_dir.rmdir()
-        self.app.stdout.write('deletion complete')
+        self.app.stdout.write('Deletion completed! \n')
