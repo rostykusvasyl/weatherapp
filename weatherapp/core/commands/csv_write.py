@@ -1,5 +1,8 @@
+""" Writing weather data in .csv format.
+"""
+
+
 import csv
-# from prettytable import from_csv
 from weatherapp.core.abstract import Command
 
 
@@ -18,7 +21,7 @@ class CsvWrite(Command):
         """
 
         data = []
-        for provider in self.app.providermanager._commands.values():
+        for name, provider in self.app.providermanager:
             location = {'location': provider(self).location}
             weather_info = provider(self).run(argv)
             location.update(weather_info)
@@ -30,4 +33,4 @@ class CsvWrite(Command):
                 writer.writeheader()
                 writer.writerows(data)
 
-        self.app.stdout.write('writing completed')
+        self.app.stdout.write('Writing completed!\n')
