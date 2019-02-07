@@ -51,4 +51,4 @@ class CommandManager(abstract.Manager):
 
     def __iter__(self):
         for key, value in self._commands.items():
-            yield (key, value)
+           yield (key, value)
