@@ -5,7 +5,8 @@ import sys
 import logging
 from argparse import ArgumentParser
 
-from weatherapp.core.formatters import TableFormatter, CsvFormatter
+from weatherapp.core.formatters.table import TableFormatter
+from weatherapp.core.formatters.datacsv import CsvFormatter
 from weatherapp.core import config
 from weatherapp.core.commandmanager import CommandManager
 from weatherapp.core.providermanager import ProviderManager
@@ -28,14 +29,13 @@ class App:
         self.providermanager = ProviderManager()
         self.commandmanager = CommandManager()
         self.formatters = self._load_formatters()
-        self.options = self.arg_parser.parse_args()
 
     @staticmethod
     def _arg_parser():
         """ Initialize argument parser.
         """
 
-        arg_parser = ArgumentParser(add_help=False)
+        arg_parser = ArgumentParser(add_help=True)
         arg_parser.add_argument('command', help='Enter "accu" for the '
                                 'Accuwether website or "rp5" for the Rp5'
                                 ' site or "sinoptik" for the sinoptik.ua',
@@ -168,6 +168,7 @@ class App:
         self.configurate_logging()
 
         command_name = self.options.command
+
         if not command_name:
             # run all providers
             return self.run_providers(remaining_args)
@@ -186,7 +187,7 @@ def main(argv=sys.argv[1:]):
     try:
         return App().run(argv)
     except KeyboardInterrupt:
-        sys.stdout.write(" Oops!!! Someone closed the program.")
+        sys.stdout.write(" Oops!!! Someone closed the program.\n")
 
 
 if __name__ == '__main__':
