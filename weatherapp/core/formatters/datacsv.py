@@ -8,6 +8,8 @@ class CsvFormatter(Formatter):
         file (.csv).
     """
 
+    name = 'csvtable'
+
     def emit(self, column_names, data):
         """ Format and print data from the iterable source.
 
