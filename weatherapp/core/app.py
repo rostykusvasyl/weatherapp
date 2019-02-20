@@ -6,8 +6,9 @@ import logging
 from argparse import ArgumentParser
 
 from weatherapp.core.formatters.table import TableFormatter
-from weatherapp.core.formatters.datacsv import CsvFormatter
+# from weatherapp.core.formatters.datacsv import CsvFormatter
 from weatherapp.core import config
+from weatherapp.core.formattermanager import FormatterManager
 from weatherapp.core.commandmanager import CommandManager
 from weatherapp.core.providermanager import ProviderManager
 
@@ -28,7 +29,7 @@ class App:
         self.arg_parser = self._arg_parser()
         self.providermanager = ProviderManager()
         self.commandmanager = CommandManager()
-        self.formatters = self._load_formatters()
+        self.formattermanager = FormatterManager()
 
     @staticmethod
     def _arg_parser():
@@ -46,17 +47,17 @@ class App:
             '--debug', help='Shows all the error information',
             action='store_true')
         arg_parser.add_argument(
+            'tomorrow', help='Shows all the error information',
+            nargs='?')
+        arg_parser.add_argument(
             '-v', '--verbose', action='count',
             dest='verbose_level', default=config.DEFAULT_VERBOSE_LEVEL,
             help='Increase verbosity of output')
-        arg_parser.add_argument('-f', '--formatter', nargs='?',
-                                help="Output format, defaults to table")
+        arg_parser.add_argument(
+            '-f', '--formatter', default='table',
+            nargs='?', help="Output format, defaults to table")
 
         return arg_parser
-
-    @staticmethod
-    def _load_formatters():
-        return {'csvtable': CsvFormatter, 'table': TableFormatter}
 
     def configurate_logging(self):
         """ Create logging handlers for any log output.
@@ -99,24 +100,24 @@ class App:
             the weather.
         """
 
-        if self.options.formatter == 'csvtable':
-            formatter = \
-                self.formatters.get(self.options.formatter, 'csvtable')()
-            columns = [title, location]
-            formatter.emit(columns, data)
+        formatter_name = self.options.formatter
+        if formatter_name:
+            formatter = self.formattermanager.get(formatter_name)
+            self.stdout.write('{}: \n'.format(title))
+            if not self.options.tomorrow:
+                columns = [location, 'today']
+            else:
+                columns = [location, 'tomorrow']
+            formatter().emit(columns, data)
             self.stdout.write('\n')
-
-        elif self.options.formatter == 'table':
-            formatter = self.formatters.get(self.options.formatter, 'table')()
-            columns = [title, location]
-            self.stdout.write(formatter.emit(columns, data))
-            self.stdout.write('\n')
-
         else:
             self.stdout.write('{}:\n'.format(title))
             self.stdout.write('*' * 12)
             self.stdout.write('\n')
-            self.stdout.write('{}\n'.format(location))
+            if not self.options.tomorrow:
+                self.stdout.write('{} {}\n'.format(location, 'today'))
+            else:
+                self.stdout.write('{} {}\n'.format(location, 'tomorrow'))
             self.stdout.write("_" * 20)
             self.stdout.write('\n')
             for key, value, in data.items():
@@ -158,7 +159,6 @@ class App:
                                      provider.location,
                                      provider.run(argv))
 
-
     def run(self, argv):
         """ Run application.
         :param argv: list of passed arguments
@@ -172,6 +172,11 @@ class App:
         if not command_name:
             # run all providers
             return self.run_providers(remaining_args)
+
+        if command_name == 'tomorrow':
+            # run all providers and show weather for tomorrow
+            self.options.tomorrow = 'tomorrow'
+            return self.run_providers(self.options.tomorrow)
 
         if command_name in self.commandmanager:
             return self.run_command(command_name, remaining_args)
