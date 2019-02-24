@@ -4,9 +4,6 @@
 import sys
 import logging
 from argparse import ArgumentParser
-
-from weatherapp.core.formatters.table import TableFormatter
-# from weatherapp.core.formatters.datacsv import CsvFormatter
 from weatherapp.core import config
 from weatherapp.core.formattermanager import FormatterManager
 from weatherapp.core.commandmanager import CommandManager
@@ -36,26 +33,52 @@ class App:
         """ Initialize argument parser.
         """
 
-        arg_parser = ArgumentParser(add_help=True)
-        arg_parser.add_argument('command', help='Enter "accu" for the '
-                                'Accuwether website or "rp5" for the Rp5'
-                                ' site or "sinoptik" for the sinoptik.ua',
+        arg_parser = ArgumentParser(description='A simple program for '
+                                    'displaying weather information.')
+        arg_parser.add_argument('command', help='Use commands: "accu" - for'
+                                'the Accuwether website or "rp5" - for'
+                                'the Rp5 site or "sinoptik" - for '
+                                'the sinoptik.ua, "configurate" - to determine'
+                                ' location, "clear_cache" - for remove cache.',
                                 nargs='?')
         arg_parser.add_argument(
-            '--refresh', help='Update cache', action='store_true')
+            '--refresh', help='Update cache.', action='store_true')
         arg_parser.add_argument(
-            '--debug', help='Shows all the error information',
+            '--debug', help='Shows all the error information.',
             action='store_true')
         arg_parser.add_argument(
-            'tomorrow', help='Shows all the error information',
+            'tomorrow', help='Show weather information for the next day.',
             nargs='?')
+        arg_parser.add_argument(
+            '--align', help='Change the alignment of all the columns. '
+            'The allowed strings are "l", "r" and "c" for left, right and '
+            'centre alignment, defaults to left alignment.',
+            default='l', nargs='?')
+        arg_parser.add_argument(
+            '-p_w', '--padding_width', help='Number of spaces on either '
+            'side of column data. Defaults is 1.',
+            default=1, nargs='?')
+        arg_parser.add_argument(
+            '-v_char', '--vertical_char', help='Single character string '
+            'used to draw vertical lines. Default is "|".',
+            nargs='?')
+        arg_parser.add_argument(
+            '-h_char', '--horizontal_char', help='Single character string '
+            'used to draw horizontal lines. Default is "-".',
+            nargs='?')
+        arg_parser.add_argument(
+            '--set_style', help='Setting a table style: '
+            '"DEFAULT" - the default look. '
+            '"PLAIN_COLUMNS" - a borderless style. '
+            '"MSWORD_FRIENDLY" - print a table in a format Microsoft Word’s.',
+            default='DEFAULT', nargs='?')
         arg_parser.add_argument(
             '-v', '--verbose', action='count',
             dest='verbose_level', default=config.DEFAULT_VERBOSE_LEVEL,
-            help='Increase verbosity of output')
+            help='Increase verbosity of output.')
         arg_parser.add_argument(
             '-f', '--formatter', default='table',
-            nargs='?', help="Output format, defaults to table")
+            nargs='?', help="Output format, defaults to table.")
 
         return arg_parser
 
