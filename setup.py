@@ -16,6 +16,7 @@ setup(
     install_requires=[
         'requests',
         'bs4',
+        'prettytable',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
