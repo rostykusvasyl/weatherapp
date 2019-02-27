@@ -50,6 +50,9 @@ class App:
             'tomorrow', help='Show weather information for the next day.',
             nargs='?')
         arg_parser.add_argument(
+            '--regexp', help='html parsing is done using regular expressions.',
+            action='store_true')
+        arg_parser.add_argument(
             '--align', help='Change the alignment of all the columns. '
             'The allowed strings are "l", "r" and "c" for left, right and '
             'centre alignment, defaults to left alignment.',
@@ -127,10 +130,10 @@ class App:
         if formatter_name:
             formatter = self.formattermanager.get(formatter_name)
             self.stdout.write('{}: \n'.format(title))
-            if not self.options.tomorrow:
-                columns = [location, 'today']
-            else:
+            if self.options.tomorrow == 'tomorrow':
                 columns = [location, 'tomorrow']
+            else:
+                columns = [location, 'today']
             formatter().emit(columns, data)
             self.stdout.write('\n')
         else:
